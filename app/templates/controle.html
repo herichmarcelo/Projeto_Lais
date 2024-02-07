@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Produção</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Adicione um link para os ícones Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Adicione um link para os emojis Twemoji -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/13.3.0/twemoji.min.css">
+    <style>
+        /* Estilização adicional */
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 50px auto;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%239e9e9e'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        button[type="submit"] {
+            background-color: #005699;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #00487c;
+        }
+        .success-message {
+            color: green;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .logo-container {
+            text-align: center; /* Centraliza horizontalmente */
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <img src="https://www.belloalimentos.com.br/uploads/novalogo.png" alt="LOGO">
+    </div>
+    <div class="container">
+        <h2>CONTROLE DE EFICIÊNCIA DA EVISCERAÇÃO <i class="far fa-question-circle"></i></h2>
+        <form action="{{ url_for('controle') }}" method="post">
+            <div class="form-group">
+                <label for="data">Data:</label>
+                <input type="date" id="data" name="data" required>
+            </div>
+            <div class="form-group">
+                <label for="hora">Hora:</label>
+                <input type="time" id="hora" name="hora" required>
+            </div>
+            <div class="form-group">
+                <label for="pergunta">Selecione uma pergunta:</label>
+                <select id="pergunta" name="pergunta" required>
+                    <option value="">Selecione uma opção</option>
+                    <option value="DESP. CORAÇÃO NA MAQ DE PAPO E TRAQUÉIA">DESP. CORAÇÃO NA MAQ DE PAPO E TRAQUÉIA</option>
+                    <option value="DESP. CORAÇÃO NA MAQ DE MOELA 01">DESP. CORAÇÃO NA MAQ DE MOELA 01</option>
+                    <option value="DESP. CORAÇÃO NA MAQ DE MOELA 02">DESP. CORAÇÃO NA MAQ DE MOELA 02</option>
+                    <option value="DESP. FÍGADO NA MAQ DE MOELA 01">DESP. FÍGADO NA MAQ DE MOELA 01</option>
+                    <option value="DESP. FÍGADO NA MAQ DE MOELA 02">DESP. FÍGADO NA MAQ DE MOELA 02</option>
+                    <option value="DESP. MOELA NO RALO">DESP. MOELA NO RALO</option>
+                    <option value="GANCHOS VAZIOS ANTES DO SIF">GANCHOS VAZIOS ANTES DO SIF</option>
+                    <option value="PERDA DE PACOTES DE MIÚDOS NA EVISCERADORA">PERDA DE PACOTES DE MIÚDOS NA EVISCERADORA</option>
+                    <option value="PERDA DE PACOTES DE MIÚDOS NO SIF">PERDA DE PACOTES DE MIÚDOS NO SIF</option>
+                    <option value="DESP. MÁQUINA DE MOELA">DESP. MÁQUINA DE MOELA</option>
+                    <option value="DESP. MÁQUINA PAPO E TRAQUEIA">DESP. MÁQUINA PAPO E TRAQUEIA</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="velocidade">Velocidade:</label>
+                <input type="number" id="velocidade" name="velocidade" required>
+                <!-- Adicione o botão calcular -->
+                <button type="button" id="calcularVelocidade">Calcular</button>
+            </div>
+            <div class="form-group">
+                <label for="quantidade">Quantidade:</label>
+                <input type="number" id="quantidade" name="quantidade" required>
+            </div>
+            <div class="form-group">
+                <label for="resultado">Resultado (Quantidade / Velocidade):</label>
+                <input type="text" id="resultado" name="resultado" readonly>
+            </div>
+            <button type="submit">Enviar <i class="far fa-paper-plane"></i></button>
+        </form>
+        <!-- Adicione uma mensagem de sucesso após o envio do formulário -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="success-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <!-- Adicione o script para calcular o resultado -->
+    <script>
+        var botaoCalculoHabilitado = true;
+    
+        // Adiciona ouvinte de eventos ao campo de quantidade
+        document.getElementById('quantidade').addEventListener('input', calcularResultado);
+    
+        // Adiciona ouvinte de eventos ao botão de calcular velocidade
+        document.getElementById('calcularVelocidade').addEventListener('click', function() {
+            if (botaoCalculoHabilitado) {
+                var velocidadeInput = document.getElementById('velocidade');
+                var valor = parseFloat(velocidadeInput.value);
+    
+                // Verifica se o valor é um número válido
+                if (!isNaN(valor)) {
+                    // Multiplica o valor por 2
+                    velocidadeInput.value = (valor * 2).toFixed(0); // Arredonda para o número inteiro mais próximo
+    
+                    // Desabilita o botão após o cálculo
+                    botaoCalculoHabilitado = false;
+                    document.getElementById('calcularVelocidade').disabled = true;
+    
+                    // Chama a função para calcular o resultado
+                    calcularResultado();
+                }
+            }
+        });
+    // Função para obter a hora atual no formato HH:MM
+    function getHoraAtual() {
+        var agora = new Date();
+        var hora = agora.getHours().toString().padStart(2, '0'); // Adiciona zero à esquerda, se necessário
+        var minutos = agora.getMinutes().toString().padStart(2, '0'); // Adiciona zero à esquerda, se necessário
+        return hora + ':' + minutos;
+    }
+
+    // Função para obter a data atual no formato DD-MM-YYYY
+    function getDataAtual() {
+        var agora = new Date();
+        var dia = agora.getDate().toString().padStart(2, '0'); // Adiciona zero à esquerda, se necessário
+        var mes = (agora.getMonth() + 1).toString().padStart(2, '0'); // Adiciona zero à esquerda, se necessário
+        var ano = agora.getFullYear();
+        return dia + '-' + mes + '-' + ano;
+    }
+
+    // Preenche o campo "Hora" com a hora atual quando a página é carregada
+    window.addEventListener('DOMContentLoaded', function() {
+        var campoHora = document.getElementById('hora');
+        campoHora.value = getHoraAtual(); // Define o valor do campo como a hora atual
+    });
+
+    // Preenche o campo "Data" com a data atual quando a página é carregada
+    window.addEventListener('DOMContentLoaded', function() {
+        var campoData = document.getElementById('data');
+        campoData.value = getDataAtual(); // Define o valor do campo como a data atual
+    });
+        // Função para calcular o resultado
+        function calcularResultado() {
+            var velocidade = parseFloat(document.getElementById('velocidade').value);
+            var quantidade = parseFloat(document.getElementById('quantidade').value);
+            var resultadoInput = document.getElementById('resultado');
+    
+            // Verifica se ambos os valores são números válidos
+            if (!isNaN(velocidade) && !isNaN(quantidade) && velocidade !== 0) {
+                // Calcula a porcentagem
+                var porcentagem = ((quantidade / velocidade) * 100).toFixed(2) + '%'; // Arredonda para o número inteiro mais próximo
+                resultadoInput.value = porcentagem;
+            } else {
+                resultadoInput.value = '';
+            }
+        }
+    </script>
+    
+    <!-- Adicione o script para os emojis -->
+    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
+    <script>twemoji.parse(document.body);</script>
+</body>
+</html>
